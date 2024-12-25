@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 import com.uni.lieferspatz.repository.KundeRepository;
+import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.AccountService;
 
 @EnableWebSecurity
@@ -28,8 +29,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService accountDetailsService(KundeRepository kundeRepository) {
-        return new AccountService(kundeRepository);
+    public UserDetailsService accountDetailsService(KundeRepository kundeRepository,
+            RestaurantRepository restaurantRepository) {
+        return new AccountService(kundeRepository, restaurantRepository);
     }
 
     @Bean
