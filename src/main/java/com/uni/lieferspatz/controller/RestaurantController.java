@@ -45,29 +45,30 @@ public class RestaurantController {
         return new ResponseEntity<>(newRestaurant, HttpStatus.OK);
     }
 
-    @PostMapping("/{restaurantId}/plz/add")
-    public ResponseEntity<String> addPlz(@PathVariable Long restaurantId,
+    @PostMapping("/plz/add")
+    public ResponseEntity<String> addPlz(
             @RequestBody LieferPlzPayload plz) {
-        this.restaurantService.savePlz(restaurantId, plz);
+        this.restaurantService.savePlz(plz);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/{restaurantId}/opening/add")
-    public ResponseEntity<String> addOpeningHours(@PathVariable Long restaurantId,
+    @PostMapping("/opening/add")
+    public ResponseEntity<String> addOpeningHours(
             @RequestBody List<OpeningHoursPayload> openingHoursPayload) {
-        this.restaurantService.saveOpeningHours(restaurantId, openingHoursPayload);
+        this.restaurantService.saveOpeningHours(openingHoursPayload);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/{restaurantId}/opening/update")
-    public ResponseEntity<String> updateOpeningHours(@PathVariable Long restaurantId,
+    @PostMapping("/opening/update")
+    public ResponseEntity<String> updateOpeningHours(
             @RequestBody List<OpeningHoursPayload> openingHoursPayload) {
-        return this.addOpeningHours(restaurantId, openingHoursPayload);
+        this.restaurantService.updateOpeningHours(openingHoursPayload);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/{restaurantId}/item/add")
-    public ResponseEntity<String> addItem(@PathVariable Long restaurantId, @RequestBody ItemPayload itemPayload) {
-        this.restaurantService.saveItem(restaurantId, itemPayload);
+    @PostMapping("/item/add")
+    public ResponseEntity<String> addItem(@RequestBody ItemPayload itemPayload) {
+        this.restaurantService.saveItem(itemPayload);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

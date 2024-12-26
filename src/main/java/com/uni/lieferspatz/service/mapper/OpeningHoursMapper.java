@@ -36,4 +36,10 @@ public class OpeningHoursMapper {
         openingHours.setCloseTime(openingHoursPayload.getCloseTime());
         return openingHours;
     }
+
+    public static List<Long> mapToIds(List<OpeningHoursPayload> openingHoursPayload) {
+        return openingHoursPayload.stream()//
+                .map(OpeningHoursPayload::getId)//
+                .collect(Collectors.toList());
+    }
 }

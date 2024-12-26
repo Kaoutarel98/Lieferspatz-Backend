@@ -11,4 +11,7 @@ import com.uni.lieferspatz.domain.Restaurant;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     public Optional<Restaurant> findByEmail(String email);
+
+    public Optional<Restaurant> findOneByEmailIgnoreCase(String email);
+
 }

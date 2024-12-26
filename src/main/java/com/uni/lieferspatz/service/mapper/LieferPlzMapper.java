@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.util.StringUtils;
+
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.payload.LieferPlzPayload;
@@ -20,8 +22,11 @@ public class LieferPlzMapper {
     }
 
     public static Set<LieferPlz> mapFromPayloadToList(Long restaurantId, LieferPlzPayload lieferPlzPayload) {
-        return Arrays.asList(lieferPlzPayload.getPlz().split(",")).stream()
-                .map(plz -> mapFromPayload(restaurantId, plz))
+        return Arrays.stream(lieferPlzPayload.getPlz().split(",")) //
+                .map(String::trim) //
+                .filter(StringUtils::hasText) //
+                .distinct() //
+                .map(plz -> mapFromPayload(restaurantId, plz)) //
                 .collect(Collectors.toSet());
     }
 }
