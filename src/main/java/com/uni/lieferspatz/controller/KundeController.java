@@ -1,39 +1,45 @@
 package com.uni.lieferspatz.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Kunde;
+import com.uni.lieferspatz.domain.Restaurant;
+import com.uni.lieferspatz.dto.api.AvailableRestaurantApi;
 import com.uni.lieferspatz.dto.payload.KundePayload;
-import com.uni.lieferspatz.repository.KundeRepository;
-import com.uni.lieferspatz.repository.RestaurantRepository;
-import com.uni.lieferspatz.service.mapper.UserMapper;
+import com.uni.lieferspatz.service.KundeService;
+import com.uni.lieferspatz.service.mapper.RestaurantMapper;
 
 @RestController
 @RequestMapping(value = "/api/v1/kunde")
 public class KundeController {
 
-    private final PasswordEncoder passwordEncoder;
-    private final KundeRepository kundeRepository;
+    private final KundeService kundeService;
 
-    public KundeController(PasswordEncoder passwordEncoder, KundeRepository kundeRepository,
-            RestaurantRepository restaurantRepository) {
-        this.kundeRepository = kundeRepository;
-        this.passwordEncoder = passwordEncoder;
+    public KundeController(KundeService kundeService) {
+        this.kundeService = kundeService;
     }
 
     @PostMapping("/erstellen")
     public ResponseEntity<Kunde> kundeErstellen(@RequestBody KundePayload kundePayload) {
-        Kunde newKunde = UserMapper.mapKunde(kundePayload, passwordEncoder);
+        this.kundeService.saveNeueKunde(kundePayload);
 
-        this.kundeRepository.save(newKunde);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(newKunde, HttpStatus.OK);
+    @GetMapping("/restaurant/get")
+    public ResponseEntity<List<AvailableRestaurantApi>> getRelatedRestaurant() {
+        List<Restaurant> restaurants = this.kundeService.getRelatedRestaurant();
+        List<AvailableRestaurantApi> result = RestaurantMapper.mapToAvailableRestaurantApi(restaurants);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }

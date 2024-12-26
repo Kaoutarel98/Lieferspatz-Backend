@@ -11,4 +11,6 @@ import com.uni.lieferspatz.domain.Kunde;
 public interface KundeRepository extends JpaRepository<Kunde, Long> {
 
     public Optional<Kunde> findByEmail(String email);
+
+    public Optional<Kunde> findOneByEmailIgnoreCase(String email);
 }
