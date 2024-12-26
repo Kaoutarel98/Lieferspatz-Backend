@@ -34,4 +34,6 @@ public class Restaurant extends User {
     @OneToMany(mappedBy = "restaurant")
     private List<OpeningHours> openingHours;
 
+    @OneToMany(mappedBy = "restaurant")
+    private List<LieferPlz> lieferPlz;
 }

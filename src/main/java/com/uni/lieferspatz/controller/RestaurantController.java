@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.payload.ItemPayload;
+import com.uni.lieferspatz.payload.LieferPlzPayload;
 import com.uni.lieferspatz.payload.OpeningHoursPayload;
 import com.uni.lieferspatz.payload.RestaurantPayload;
 import com.uni.lieferspatz.repository.RestaurantRepository;
@@ -42,6 +43,13 @@ public class RestaurantController {
         this.restaurantRepository.save(newRestaurant);
 
         return new ResponseEntity<>(newRestaurant, HttpStatus.OK);
+    }
+
+    @PostMapping("/{restaurantId}/plz/add")
+    public ResponseEntity<String> addPlz(@PathVariable Long restaurantId,
+            @RequestBody LieferPlzPayload plz) {
+        this.restaurantService.savePlz(restaurantId, plz);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{restaurantId}/opening/add")
