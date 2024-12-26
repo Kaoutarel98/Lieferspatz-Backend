@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.payload.OpeningHoursPayload;
+import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
 
 public class OpeningHoursMapper {
 

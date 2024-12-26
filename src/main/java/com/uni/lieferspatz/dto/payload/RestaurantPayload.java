@@ -1,4 +1,4 @@
-package com.uni.lieferspatz.payload;
+package com.uni.lieferspatz.dto.payload;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,4 +9,5 @@ public class RestaurantPayload extends UserPayload {
     private String name;
     private String beschreibung;
     private String image;
+
 }

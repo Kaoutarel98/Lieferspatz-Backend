@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.payload.LieferPlzPayload;
+import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 
 public class LieferPlzMapper {
 

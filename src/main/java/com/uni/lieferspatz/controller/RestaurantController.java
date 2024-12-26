@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.payload.ItemPayload;
-import com.uni.lieferspatz.payload.LieferPlzPayload;
-import com.uni.lieferspatz.payload.OpeningHoursPayload;
-import com.uni.lieferspatz.payload.RestaurantPayload;
+import com.uni.lieferspatz.dto.payload.ItemPayload;
+import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
+import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
+import com.uni.lieferspatz.dto.payload.RestaurantPayload;
 import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.RestaurantService;
 import com.uni.lieferspatz.service.mapper.UserMapper;

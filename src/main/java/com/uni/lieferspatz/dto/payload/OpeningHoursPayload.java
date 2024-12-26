@@ -1,4 +1,4 @@
-package com.uni.lieferspatz.payload;
+package com.uni.lieferspatz.dto.payload;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

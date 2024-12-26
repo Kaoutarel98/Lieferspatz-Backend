@@ -5,9 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.User;
-import com.uni.lieferspatz.payload.KundePayload;
-import com.uni.lieferspatz.payload.RestaurantPayload;
-import com.uni.lieferspatz.payload.UserPayload;
+import com.uni.lieferspatz.dto.payload.KundePayload;
+import com.uni.lieferspatz.dto.payload.RestaurantPayload;
+import com.uni.lieferspatz.dto.payload.UserPayload;
 
 public class UserMapper {
 

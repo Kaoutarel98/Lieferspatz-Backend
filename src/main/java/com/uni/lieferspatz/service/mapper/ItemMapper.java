@@ -2,7 +2,7 @@ package com.uni.lieferspatz.service.mapper;
 
 import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.payload.ItemPayload;
+import com.uni.lieferspatz.dto.payload.ItemPayload;
 
 public class ItemMapper {
     public static Item mapFromPayload(Long restaurantId, ItemPayload itemPayload) {

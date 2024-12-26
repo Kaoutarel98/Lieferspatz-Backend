@@ -1,4 +1,4 @@
-package com.uni.lieferspatz.payload;
+package com.uni.lieferspatz.dto.payload;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserPayload {
+    private Long id;
     private String strasse;
     private String plz;
     private String ort;

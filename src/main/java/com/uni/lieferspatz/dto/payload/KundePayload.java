@@ -1,4 +1,4 @@
-package com.uni.lieferspatz.payload;
+package com.uni.lieferspatz.dto.payload;
 
 import lombok.Getter;
 import lombok.Setter;

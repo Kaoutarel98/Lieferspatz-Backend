@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Kunde;
-import com.uni.lieferspatz.payload.KundePayload;
+import com.uni.lieferspatz.dto.payload.KundePayload;
 import com.uni.lieferspatz.repository.KundeRepository;
 import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.mapper.UserMapper;
