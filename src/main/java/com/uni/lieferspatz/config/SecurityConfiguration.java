@@ -11,16 +11,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 import com.uni.lieferspatz.repository.KundeRepository;
 import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.AccountService;
+import com.uni.lieferspatz.service.auth.JwtFilter;
 
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
 public class SecurityConfiguration {
+
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfiguration(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,6 +47,7 @@ public class SecurityConfiguration {
         //@formatter:off
         http
         .csrf(csrf -> csrf.disable())
+        .addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .headers(headers -> headers
             .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")) 
             .frameOptions(frameOptions -> frameOptions.deny())
@@ -61,7 +70,9 @@ public class SecurityConfiguration {
             .requestMatchers("/content/**").permitAll() // Allow content resources
             .requestMatchers("/swagger-ui/**").permitAll() // Allow Swagger UI
             .requestMatchers("/test/**").permitAll()
-            .requestMatchers("/api/**").permitAll()
+            .requestMatchers("/api/**/erstellen").permitAll()
+            .requestMatchers("/api/**/login").permitAll()
+            .requestMatchers("/api/**").authenticated()
         )
         .httpBasic(httpBasic -> {}); // Enable Basic Authentication
     //@formatter:on 
