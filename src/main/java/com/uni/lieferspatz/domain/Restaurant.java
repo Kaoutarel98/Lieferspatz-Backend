@@ -1,5 +1,6 @@
 package com.uni.lieferspatz.domain;
 
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -29,4 +30,8 @@ public class Restaurant extends User {
 
     @OneToMany(mappedBy = "restaurant")
     private Set<Item> items;
+
+    @OneToMany(mappedBy = "restaurant")
+    private List<OpeningHours> openingHours;
+
 }

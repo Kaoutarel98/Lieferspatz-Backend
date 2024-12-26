@@ -1,5 +1,7 @@
 package com.uni.lieferspatz.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.payload.ItemPayload;
+import com.uni.lieferspatz.payload.OpeningHoursPayload;
 import com.uni.lieferspatz.payload.RestaurantPayload;
 import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.RestaurantService;
@@ -39,6 +42,19 @@ public class RestaurantController {
         this.restaurantRepository.save(newRestaurant);
 
         return new ResponseEntity<>(newRestaurant, HttpStatus.OK);
+    }
+
+    @PostMapping("/{restaurantId}/opening/add")
+    public ResponseEntity<String> addOpeningHours(@PathVariable Long restaurantId,
+            @RequestBody List<OpeningHoursPayload> openingHoursPayload) {
+        this.restaurantService.saveOpeningHours(restaurantId, openingHoursPayload);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{restaurantId}/opening/update")
+    public ResponseEntity<String> updateOpeningHours(@PathVariable Long restaurantId,
+            @RequestBody List<OpeningHoursPayload> openingHoursPayload) {
+        return this.addOpeningHours(restaurantId, openingHoursPayload);
     }
 
     @PostMapping("/{restaurantId}/item/add")
