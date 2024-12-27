@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
+import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.User;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
@@ -94,6 +95,11 @@ public class RestaurantService {
             e.printStackTrace();
             throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
         }
+    }
+
+    public Restaurant getRestaurant(Long restaurantId) {
+        return this.restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResourceException("Restaurant nicht gefunden"));
     }
 
     public void saveItem(ItemPayload itemPayload) {

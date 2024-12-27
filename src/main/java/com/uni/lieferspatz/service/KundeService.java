@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
@@ -28,12 +29,15 @@ public class KundeService {
     private final PasswordEncoder passwordEncoder;
     private final KundeRepository kundeRepository;
     private final LieferPlzRepository lieferPlzRepository;
+    private final RestaurantService restaurantService;
 
     public KundeService(PasswordEncoder passwordEncoder, KundeRepository kundeRepository,
-            LieferPlzRepository lieferPlzRepository) {
+            LieferPlzRepository lieferPlzRepository,
+            RestaurantService restaurantService) {
         this.kundeRepository = kundeRepository;
         this.passwordEncoder = passwordEncoder;
         this.lieferPlzRepository = lieferPlzRepository;
+        this.restaurantService = restaurantService;
     }
 
     public void saveNeueKunde(KundePayload kundePayload) {
@@ -54,6 +58,12 @@ public class KundeService {
                 .flatMap(List::stream)
                 .filter(openingHours -> this.isRestaurantOpen(openingHours, currentTime, today))
                 .map(openingHours -> openingHours.getRestaurant())//
+                .collect(Collectors.toList());
+    }
+
+    public List<Item> getRestaurantItems(Long restaurantId) {
+        return this.restaurantService.getRestaurant(restaurantId)//
+                .getItems().stream()//
                 .collect(Collectors.toList());
     }
 
