@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uni.lieferspatz.constants.AuthoritiesConstants;
+import com.uni.lieferspatz.constants.RolesConstants;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.repository.KundeRepository;
@@ -32,12 +32,12 @@ public class AccountService implements UserDetailsService {
         Kunde kunde = this.kundeRepository.findByEmail(lowerEmail).orElse(null);
         if (kunde != null) {
             return new User(kunde.getEmail(), kunde.getPassword(),
-                    Collections.singleton(new SimpleGrantedAuthority(AuthoritiesConstants.USER)));
+                    Collections.singleton(new SimpleGrantedAuthority(RolesConstants.KUNDE)));
         }
         Restaurant restaurant = this.restaurantRepository.findByEmail(lowerEmail).orElse(null);
         if (restaurant != null) {
             return new User(restaurant.getEmail(), restaurant.getPassword(),
-                    Collections.singleton(new SimpleGrantedAuthority(AuthoritiesConstants.RESTAURANT)));
+                    Collections.singleton(new SimpleGrantedAuthority(RolesConstants.RESTAURANT)));
         }
         throw new UsernameNotFoundException("User existiert nicht");
     }

@@ -16,7 +16,6 @@ import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.domain.User;
 import com.uni.lieferspatz.dto.payload.KundePayload;
 import com.uni.lieferspatz.repository.KundeRepository;
 import com.uni.lieferspatz.repository.LieferPlzRepository;
@@ -73,7 +72,7 @@ public class KundeService {
                 && currenTime.isBefore(openingHours.getCloseTime());
     }
 
-    public Optional<User> getCurrentAccount() {
+    public Optional<Kunde> getCurrentAccount() {
         return SecurityUtils.getCurrentAccountEmail().flatMap(this.kundeRepository::findOneByEmailIgnoreCase);
     }
 }

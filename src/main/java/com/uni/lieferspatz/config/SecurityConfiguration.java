@@ -72,6 +72,8 @@ public class SecurityConfiguration {
             .requestMatchers("/test/**").permitAll()
             .requestMatchers("/api/**/erstellen").permitAll()
             .requestMatchers("/api/**/login").permitAll()
+            .requestMatchers("/api/**/kunde").hasRole("KUNDE")
+            .requestMatchers("/api/**/warenkorb").hasRole("KUNDE")
             .requestMatchers("/api/**").authenticated()
         )
         .httpBasic(httpBasic -> {}); // Enable Basic Authentication

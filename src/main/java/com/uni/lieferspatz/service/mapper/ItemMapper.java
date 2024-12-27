@@ -23,16 +23,6 @@ public class ItemMapper {
         return item;
     }
 
-    public static ItemPayload mapToPayload(Item item) {
-        ItemPayload itemPayload = new ItemPayload();
-        itemPayload.setId(item.getId());
-        itemPayload.setName(item.getName());
-        itemPayload.setBeschreibung(item.getBeschreibung());
-        itemPayload.setPreis(item.getPreis());
-        itemPayload.setImageUrl(item.getImageUrl());
-        return itemPayload;
-    }
-
     public static ItemApi mapToItemApi(Item item) {
         ItemApi itemApi = new ItemApi();
         itemApi.setId(item.getId());

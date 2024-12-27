@@ -89,7 +89,6 @@ public class RestaurantService {
     private void saveOpeningHoursToRepo(Long restaurantId, List<OpeningHoursPayload> openingHoursPayload) {
         Set<OpeningHours> openingHours = OpeningHoursMapper.mapFromPayload(restaurantId, openingHoursPayload);
         try {
-            System.out.println("WOW");
             this.openingHoursRepository.saveAll(openingHours);
         } catch (Exception e) {
             e.printStackTrace();
