@@ -15,6 +15,7 @@ public class BestellungMapper {
 		BestellungApi bestellungApi = new BestellungApi();
 		bestellungApi.setId(bestellung.getId());
 		bestellungApi.setRestaurantName(bestellung.getRestaurant().getName());
+		bestellungApi.setKundeName(bestellung.getKunde().getVorname() + " " + bestellung.getKunde().getNachname());
 		bestellungApi.setGesamtpreis(bestellung.getGesamtpreis());
 		bestellungApi.setStatus(bestellung.getStatus().name());
 		bestellungApi.setLieferAdresse(bestellung.getLieferAdresse());

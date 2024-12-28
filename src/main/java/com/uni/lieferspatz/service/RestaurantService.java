@@ -12,7 +12,6 @@ import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.domain.User;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
@@ -80,7 +79,6 @@ public class RestaurantService {
         List<OpeningHours> invalidPayloads = existingOpeningHours.stream()
                 .filter(item -> !item.getRestaurant().getId().equals(restaurantId))
                 .collect(Collectors.toList());
-
         if (!invalidPayloads.isEmpty()) {
             throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
         }
@@ -131,7 +129,6 @@ public class RestaurantService {
                 throw new ResourceException("Item nicht gefunden");
             });
         });
-
     }
 
     public void updateItem(ItemPayload itemPayload) {
@@ -150,7 +147,7 @@ public class RestaurantService {
         });
     }
 
-    public Optional<User> getCurrentAccount() {
+    public Optional<Restaurant> getCurrentAccount() {
         return SecurityUtils.getCurrentAccountEmail().flatMap(this.restaurantRepository::findOneByEmailIgnoreCase);
     }
 }

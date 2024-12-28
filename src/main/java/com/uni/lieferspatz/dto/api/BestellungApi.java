@@ -11,6 +11,7 @@ import lombok.Setter;
 public class BestellungApi {
 	private Long id;
 	private String restaurantName;
+	private String kundeName;
 	private double gesamtpreis;
 	private String status;
 	private String lieferAdresse;

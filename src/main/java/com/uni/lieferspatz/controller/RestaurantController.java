@@ -6,42 +6,47 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uni.lieferspatz.domain.Bestellung;
 import com.uni.lieferspatz.domain.Restaurant;
+import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
 import com.uni.lieferspatz.dto.payload.RestaurantPayload;
 import com.uni.lieferspatz.repository.RestaurantRepository;
+import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.RestaurantService;
+import com.uni.lieferspatz.service.mapper.BestellungMapper;
 import com.uni.lieferspatz.service.mapper.UserMapper;
 
 @RestController
 @RequestMapping(value = "/api/v1/restaurant")
 public class RestaurantController {
-
     private final PasswordEncoder passwordEncoder;
     private final RestaurantRepository restaurantRepository;
     private final RestaurantService restaurantService;
+    private final BestellungService bestellungService;
 
     public RestaurantController(PasswordEncoder passwordEncoder,
-            RestaurantRepository restaurantRepository, RestaurantService restaurantService) {
+            RestaurantRepository restaurantRepository, RestaurantService restaurantService,
+            BestellungService bestellungService) {
         this.passwordEncoder = passwordEncoder;
         this.restaurantRepository = restaurantRepository;
         this.restaurantService = restaurantService;
+        this.bestellungService = bestellungService;
     }
 
     @PostMapping("/erstellen")
     public ResponseEntity<Restaurant> erstellen(@RequestBody RestaurantPayload restaurantPayload) {
         Restaurant newRestaurant = UserMapper.mapRestaurant(restaurantPayload, passwordEncoder);
-
         this.restaurantRepository.save(newRestaurant);
-
         return new ResponseEntity<>(newRestaurant, HttpStatus.OK);
     }
 
@@ -82,5 +87,30 @@ public class RestaurantController {
     public ResponseEntity<String> updateItem(@RequestBody ItemPayload itemPayload) {
         this.restaurantService.updateItem(itemPayload);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/bestellung")
+    public ResponseEntity<List<BestellungApi>> getBestellungen() {
+        List<Bestellung> bestellungs = this.bestellungService.getRestaurantBestellungen();
+        List<BestellungApi> result = BestellungMapper.mapToBestellungApi(bestellungs);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/bestellung/confirm/{bestellungId}")
+    public ResponseEntity<List<BestellungApi>> confirmBestellung(@PathVariable Long bestellungId) {
+        this.bestellungService.confirmBestellung(bestellungId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/bestellung/stornieren/{bestellungId}")
+    public ResponseEntity<List<BestellungApi>> stornierenBestellung(@PathVariable Long bestellungId) {
+        this.bestellungService.stornierenBestellung(bestellungId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/bestellung/complete/{bestellungId}")
+    public ResponseEntity<List<BestellungApi>> completeBestellung(@PathVariable Long bestellungId) {
+        this.bestellungService.stornierenBestellung(bestellungId);
+        return ResponseEntity.ok().build();
     }
 }
