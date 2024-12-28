@@ -18,14 +18,19 @@ import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.WarenkorbItem;
 import com.uni.lieferspatz.service.exception.ResourceException;
 
+import jakarta.persistence.EntityManager;
+
 @Service
 public class BestellungService {
     private final KundeService kundeService;
     private final RestaurantService restaurantService;
+    private final EntityManager entityManager;
 
-    public BestellungService(KundeService kundeService, RestaurantService restaurantService) {
+    public BestellungService(KundeService kundeService, RestaurantService restaurantService,
+            EntityManager entityManager) {
         this.kundeService = kundeService;
         this.restaurantService = restaurantService;
+        this.entityManager = entityManager;
     }
 
     @Transactional
@@ -46,7 +51,6 @@ public class BestellungService {
             throw new ResourceException("Nicht genug Geldbeutel");
         }
         Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
-        bestellung.setKunde(kunde);
         bestellung.setRestaurant(restaurant);
         bestellung.setStatus(BestellStatus.BEARBEITUNG);
         bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
@@ -56,8 +60,10 @@ public class BestellungService {
         bestellung.setZahlungsart("PayPal");
         bestellung.setGesamtpreis(gesamtpreis);
         kunde.setVorgemerkt(kunde.getVorgemerkt().add(gesamtpreis));
-        kunde.getBestellungen().add(bestellung);
+        kunde.addBestellung(bestellung);
         warenkorbItems.clear();
+        entityManager.persist(kunde);
+        entityManager.flush();
     }
 
     private List<BestellungItem> mapToBestellungItems(Bestellung bestellung, List<WarenkorbItem> warenkorbItems) {

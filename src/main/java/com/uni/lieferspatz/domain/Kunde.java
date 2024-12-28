@@ -35,4 +35,14 @@ public class Kunde extends User {
     public String getRole() {
         return RolesConstants.KUNDE;
     }
+
+    public void addBestellung(Bestellung bestellung) {
+        this.bestellungen.add(bestellung);
+        bestellung.setKunde(this);
+    }
+
+    public void removeBestellung(Bestellung bestellungen) {
+        this.bestellungen.remove(bestellungen);
+        bestellungen.setKunde(null);
+    }
 }
