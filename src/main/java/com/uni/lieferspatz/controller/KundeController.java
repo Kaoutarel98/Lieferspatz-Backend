@@ -17,6 +17,7 @@ import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.AvailableRestaurantApi;
 import com.uni.lieferspatz.dto.api.ItemApi;
 import com.uni.lieferspatz.dto.payload.KundePayload;
+import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.KundeService;
 import com.uni.lieferspatz.service.mapper.ItemMapper;
 import com.uni.lieferspatz.service.mapper.RestaurantMapper;
@@ -26,9 +27,11 @@ import com.uni.lieferspatz.service.mapper.RestaurantMapper;
 public class KundeController {
 
     private final KundeService kundeService;
+    private final BestellungService bestellungService;
 
-    public KundeController(KundeService kundeService) {
+    public KundeController(KundeService kundeService, BestellungService bestellungService) {
         this.kundeService = kundeService;
+        this.bestellungService = bestellungService;
     }
 
     @PostMapping("/erstellen")
@@ -52,6 +55,13 @@ public class KundeController {
         List<ItemApi> result = ItemMapper.mapToItemApi(items);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/bestellung")
+    public ResponseEntity<Void> bestellung() {
+        this.bestellungService.saveBestellung();
+
+        return ResponseEntity.ok().build();
     }
 
 }

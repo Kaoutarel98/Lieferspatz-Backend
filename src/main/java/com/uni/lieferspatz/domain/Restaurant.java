@@ -3,6 +3,7 @@ package com.uni.lieferspatz.domain;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -16,24 +17,20 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Restaurant extends User {
-
     @Column(name = "name")
     @NotNull
     private String name;
-
     @Column(name = "beschreibung")
     @NotNull
     private String beschreibung;
-
     @Column(name = "image")
     private String image;
-
     @OneToMany(mappedBy = "restaurant")
     private Set<Item> items;
-
     @OneToMany(mappedBy = "restaurant")
     private List<OpeningHours> openingHours;
-
     @OneToMany(mappedBy = "restaurant")
     private List<LieferPlz> lieferPlz;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bestellung> bestellungen;
 }

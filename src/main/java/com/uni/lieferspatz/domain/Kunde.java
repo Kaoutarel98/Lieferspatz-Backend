@@ -15,14 +15,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Kunde extends User {
-
     @Column(name = "vorname")
     private String vorname;
-
     @Column(name = "nachname")
     private String nachname;
-
     @OneToMany(mappedBy = "kunde", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WarenkorbItem> warenkorbItems;
-
+    @OneToMany(mappedBy = "kunde", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bestellung> bestellungen;
 }
