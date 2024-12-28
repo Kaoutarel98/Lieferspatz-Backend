@@ -1,5 +1,7 @@
 package com.uni.lieferspatz.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.uni.lieferspatz.constants.BestellStatus;
 import com.uni.lieferspatz.domain.Bestellung;
 import com.uni.lieferspatz.domain.BestellungItem;
+import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.WarenkorbItem;
 import com.uni.lieferspatz.service.exception.ResourceException;
@@ -27,30 +30,34 @@ public class BestellungService {
 
     @Transactional
     public void saveBestellung() {
-        this.kundeService.getCurrentAccount().ifPresent(kunde -> {
-            List<WarenkorbItem> warenkorbItems = kunde.getWarenkorbItems();
-            if (warenkorbItems.size() == 0) {
-                throw new RuntimeException("Warenkorb ist leer");
-            }
-            Bestellung bestellung = new Bestellung();
-            Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
-            bestellung.setKunde(kunde);
-            bestellung.setRestaurant(restaurant);
-            bestellung.setStatus(BestellStatus.BEARBEITUNG);
-            bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
-                    kunde.getPlz(), kunde.getOrt()));
-            bestellung.setBestellzeitpunkt(LocalDateTime.now());
-            bestellung.setUpdatedAt(LocalDateTime.now());
-            bestellung.setZahlungsart("PayPal");
-            List<BestellungItem> bestellungItems = this.mapToBestellungItems(bestellung, warenkorbItems);
-            bestellung.setBestellungItems(bestellungItems);
-            double gesamtpreis = bestellungItems.stream()
-                    .mapToDouble(BestellungItem::getTotalPreis)
-                    .sum();
-            bestellung.setGesamtpreis(gesamtpreis);
-            kunde.getBestellungen().add(bestellung);
-            warenkorbItems.clear();
-        });
+        Kunde kunde = this.kundeService.getCurrentAccount().get();
+        List<WarenkorbItem> warenkorbItems = kunde.getWarenkorbItems();
+        if (warenkorbItems.size() == 0) {
+            throw new ResourceException("Warenkorb ist leer");
+        }
+        Bestellung bestellung = new Bestellung();
+        List<BestellungItem> bestellungItems = this.mapToBestellungItems(bestellung, warenkorbItems);
+        bestellung.setBestellungItems(bestellungItems);
+        BigDecimal gesamtpreis = bestellungItems.stream()
+                .map(BestellungItem::getTotalPreis)
+                .map(BigDecimal::valueOf)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (kunde.getGeldbeutel().subtract(kunde.getVorgemerkt()).compareTo(gesamtpreis) < 0) {
+            throw new ResourceException("Nicht genug Geldbeutel");
+        }
+        Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
+        bestellung.setKunde(kunde);
+        bestellung.setRestaurant(restaurant);
+        bestellung.setStatus(BestellStatus.BEARBEITUNG);
+        bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
+                kunde.getPlz(), kunde.getOrt()));
+        bestellung.setBestellzeitpunkt(LocalDateTime.now());
+        bestellung.setUpdatedAt(LocalDateTime.now());
+        bestellung.setZahlungsart("PayPal");
+        bestellung.setGesamtpreis(gesamtpreis);
+        kunde.setVorgemerkt(kunde.getVorgemerkt().add(gesamtpreis));
+        kunde.getBestellungen().add(bestellung);
+        warenkorbItems.clear();
     }
 
     private List<BestellungItem> mapToBestellungItems(Bestellung bestellung, List<WarenkorbItem> warenkorbItems) {
@@ -87,6 +94,14 @@ public class BestellungService {
                             BestellStatus.BEARBEITUNG);
                     bestellung.setStatus(BestellStatus.ZUBEREITUNG);
                     bestellung.setUpdatedAt(LocalDateTime.now());
+                    Kunde kunde = bestellung.getKunde();
+                    kunde.setVorgemerkt(kunde.getVorgemerkt().subtract(bestellung.getGesamtpreis()));
+                    kunde.setGeldbeutel(kunde.getGeldbeutel().subtract(bestellung.getGesamtpreis()));
+                    BigDecimal restaurantWin = bestellung.getGesamtpreis()
+                            .multiply(BigDecimal.valueOf(0.85))
+                            .setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal restaurantGeldbeutel = res.getGeldbeutel();
+                    res.setGeldbeutel(restaurantGeldbeutel.add(restaurantWin));
                 }, () -> {
                     throw new ResourceException("Restaurant nicht gefunden");
                 });
@@ -100,6 +115,8 @@ public class BestellungService {
                             BestellStatus.BEARBEITUNG);
                     bestellung.setStatus(BestellStatus.STORNIERT);
                     bestellung.setUpdatedAt(LocalDateTime.now());
+                    Kunde kunde = bestellung.getKunde();
+                    kunde.setVorgemerkt(kunde.getVorgemerkt().subtract(bestellung.getGesamtpreis()));
                 }, () -> {
                     throw new ResourceException("Restaurant nicht gefunden");
                 });

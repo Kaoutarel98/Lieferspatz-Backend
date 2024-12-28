@@ -1,5 +1,6 @@
 package com.uni.lieferspatz.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,8 +36,9 @@ public class Bestellung {
     @ManyToOne
     @JoinColumn(name = "kunde_id", nullable = false)
     private Kunde kunde;
-    @Column(name = "gesamtpreis")
-    private double gesamtpreis;
+    @Column(name = "gesamtpreis", precision = 15, scale = 2)
+    @NotNull
+    private BigDecimal gesamtpreis;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private BestellStatus status;

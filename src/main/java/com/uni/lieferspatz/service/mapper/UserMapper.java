@@ -1,5 +1,7 @@
 package com.uni.lieferspatz.service.mapper;
 
+import java.math.BigDecimal;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.uni.lieferspatz.domain.Kunde;
@@ -10,7 +12,6 @@ import com.uni.lieferspatz.dto.payload.RestaurantPayload;
 import com.uni.lieferspatz.dto.payload.UserPayload;
 
 public class UserMapper {
-
     private static void mapUser(User user, UserPayload userPayload, PasswordEncoder passwordEncoder) {
         user.setEmail(userPayload.getEmail().toLowerCase());
         user.setStrasse(userPayload.getStrasse());
@@ -25,16 +26,17 @@ public class UserMapper {
         mapUser(newKunde, kundePayload, passwordEncoder);
         newKunde.setVorname(kundePayload.getVorname());
         newKunde.setNachname(kundePayload.getNachname());
+        newKunde.setGeldbeutel(BigDecimal.valueOf(100));
         return newKunde;
     }
 
     public static Restaurant mapRestaurant(RestaurantPayload restaurantPayload, PasswordEncoder passwordEncoder) {
         Restaurant newRestaurant = new Restaurant();
         mapUser(newRestaurant, restaurantPayload, passwordEncoder);
-
         newRestaurant.setName(restaurantPayload.getName());
         newRestaurant.setBeschreibung(restaurantPayload.getBeschreibung());
         newRestaurant.setImage(restaurantPayload.getImage());
+        newRestaurant.setGeldbeutel(BigDecimal.ZERO);
         return newRestaurant;
     }
 }
