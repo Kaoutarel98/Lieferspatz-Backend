@@ -1,12 +1,14 @@
 package com.uni.lieferspatz.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uni.lieferspatz.constants.BestellStatus;
 import com.uni.lieferspatz.domain.Bestellung;
 import com.uni.lieferspatz.domain.BestellungItem;
 import com.uni.lieferspatz.domain.Restaurant;
@@ -31,7 +33,7 @@ public class BestellungService {
             Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
             bestellung.setKunde(kunde);
             bestellung.setRestaurant(restaurant);
-            bestellung.setStatus("Bestellt");
+            bestellung.setStatus(BestellStatus.BEARBEITUNG);
             bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
                     kunde.getPlz(), kunde.getOrt()));
             bestellung.setBestellzeitpunkt(LocalDateTime.now());
@@ -44,6 +46,7 @@ public class BestellungService {
                     .sum();
             bestellung.setGesamtpreis(gesamtpreis);
             kunde.getBestellungen().add(bestellung);
+            warenkorbItems.clear();
         });
     }
 
@@ -59,5 +62,20 @@ public class BestellungService {
             bestellungItem.setBestellung(bestellung);
             return bestellungItem;
         }).collect(Collectors.toList());
+    }
+
+    public List<Bestellung> getBestellungen() {
+        return this.kundeService.getCurrentAccount()
+                .map(kunde -> kunde.getBestellungen())
+                .orElse(Collections.emptyList());
+    }
+
+    public Bestellung getBestellungenById(Long bestellungId) {
+        return this.kundeService.getCurrentAccount()
+                .map(kunde -> kunde.getBestellungen().stream()
+                        .filter(bestellung -> bestellung.getId().equals(bestellungId))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Bestellung nicht gefunden")))
+                .orElseThrow(() -> new RuntimeException("Kunde nicht gefunden"));
     }
 }

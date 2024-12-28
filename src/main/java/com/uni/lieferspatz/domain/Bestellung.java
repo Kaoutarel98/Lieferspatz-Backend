@@ -3,9 +3,13 @@ package com.uni.lieferspatz.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.uni.lieferspatz.constants.BestellStatus;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +37,8 @@ public class Bestellung {
     @Column(name = "gesamtpreis")
     private double gesamtpreis;
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BestellStatus status;
     @Column(name = "lieferadresse")
     private String lieferAdresse;
     @Column(name = "bestellzeitpunkt")

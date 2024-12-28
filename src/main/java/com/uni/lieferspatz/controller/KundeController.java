@@ -11,21 +11,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uni.lieferspatz.domain.Bestellung;
 import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.AvailableRestaurantApi;
+import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.dto.api.ItemApi;
 import com.uni.lieferspatz.dto.payload.KundePayload;
 import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.KundeService;
+import com.uni.lieferspatz.service.mapper.BestellungMapper;
 import com.uni.lieferspatz.service.mapper.ItemMapper;
 import com.uni.lieferspatz.service.mapper.RestaurantMapper;
 
 @RestController
 @RequestMapping(value = "/api/v1/kunde")
 public class KundeController {
-
     private final KundeService kundeService;
     private final BestellungService bestellungService;
 
@@ -37,7 +39,6 @@ public class KundeController {
     @PostMapping("/erstellen")
     public ResponseEntity<Kunde> kundeErstellen(@RequestBody KundePayload kundePayload) {
         this.kundeService.saveNeueKunde(kundePayload);
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -45,7 +46,6 @@ public class KundeController {
     public ResponseEntity<List<AvailableRestaurantApi>> getRelatedRestaurant() {
         List<Restaurant> restaurants = this.kundeService.getRelatedRestaurant();
         List<AvailableRestaurantApi> result = RestaurantMapper.mapToAvailableRestaurantApi(restaurants);
-
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -53,15 +53,26 @@ public class KundeController {
     public ResponseEntity<List<ItemApi>> getRestaurantItems(@PathVariable Long restaurantId) {
         List<Item> items = this.kundeService.getRestaurantItems(restaurantId);
         List<ItemApi> result = ItemMapper.mapToItemApi(items);
-
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/bestellung")
     public ResponseEntity<Void> bestellung() {
         this.bestellungService.saveBestellung();
-
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/bestellung")
+    public ResponseEntity<List<BestellungApi>> getBestellung() {
+        List<Bestellung> bestellungs = this.bestellungService.getBestellungen();
+        List<BestellungApi> result = BestellungMapper.mapToBestellungApi(bestellungs);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/bestellung/{bestellungId}")
+    public ResponseEntity<BestellungApi> getBestellungById(@PathVariable Long bestellungId) {
+        Bestellung bestellung = this.bestellungService.getBestellungenById(bestellungId);
+        BestellungApi result = BestellungMapper.mapToBestellungApi(bestellung);
+        return ResponseEntity.ok(result);
+    }
 }
