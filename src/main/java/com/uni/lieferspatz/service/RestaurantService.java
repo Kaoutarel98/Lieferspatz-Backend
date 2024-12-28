@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +33,22 @@ public class RestaurantService {
     private final OpeningHoursRepository openingHoursRepository;
     private final LieferPlzRepository lieferPlzRepository;
     private final RestaurantRepository restaurantRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RestaurantService(ItemRepository itemRepository, OpeningHoursRepository openingHoursRepository,
-            LieferPlzRepository lieferPlzRepository, RestaurantRepository restaurantRepository) {
+            LieferPlzRepository lieferPlzRepository, RestaurantRepository restaurantRepository,
+            PasswordEncoder passwordEncoder) {
         this.itemRepository = itemRepository;
         this.openingHoursRepository = openingHoursRepository;
         this.lieferPlzRepository = lieferPlzRepository;
         this.restaurantRepository = restaurantRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public void saveNeueRestaurant(Restaurant kunde) {
+        String encodedPassword = this.passwordEncoder.encode(kunde.getPassword());
+        kunde.setPassword(encodedPassword);
+        this.restaurantRepository.save(kunde);
     }
 
     public void savePlz(LieferPlzPayload plz) {

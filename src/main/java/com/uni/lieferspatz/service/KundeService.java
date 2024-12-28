@@ -16,15 +16,12 @@ import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
-import com.uni.lieferspatz.dto.payload.KundePayload;
 import com.uni.lieferspatz.repository.KundeRepository;
 import com.uni.lieferspatz.repository.LieferPlzRepository;
 import com.uni.lieferspatz.service.auth.SecurityUtils;
-import com.uni.lieferspatz.service.mapper.UserMapper;
 
 @Service
 public class KundeService {
-
     private final PasswordEncoder passwordEncoder;
     private final KundeRepository kundeRepository;
     private final LieferPlzRepository lieferPlzRepository;
@@ -39,9 +36,10 @@ public class KundeService {
         this.restaurantService = restaurantService;
     }
 
-    public void saveNeueKunde(KundePayload kundePayload) {
-        Kunde newKunde = UserMapper.mapKunde(kundePayload, passwordEncoder);
-        this.kundeRepository.save(newKunde);
+    public void saveNeueKunde(Kunde kunde) {
+        String encodedPassword = passwordEncoder.encode(kunde.getPassword());
+        kunde.setPassword(encodedPassword);
+        this.kundeRepository.save(kunde);
     }
 
     public List<Restaurant> getRelatedRestaurant() {

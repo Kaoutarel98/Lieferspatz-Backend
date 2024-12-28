@@ -3,6 +3,8 @@ package com.uni.lieferspatz.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.uni.lieferspatz.constants.RolesConstants;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,4 +30,9 @@ public class Kunde extends User {
     private List<WarenkorbItem> warenkorbItems;
     @OneToMany(mappedBy = "kunde", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bestellung> bestellungen;
+
+    @Override
+    public String getRole() {
+        return RolesConstants.KUNDE;
+    }
 }

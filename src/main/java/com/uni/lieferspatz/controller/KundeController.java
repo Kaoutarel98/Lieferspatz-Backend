@@ -24,6 +24,7 @@ import com.uni.lieferspatz.service.KundeService;
 import com.uni.lieferspatz.service.mapper.BestellungMapper;
 import com.uni.lieferspatz.service.mapper.ItemMapper;
 import com.uni.lieferspatz.service.mapper.RestaurantMapper;
+import com.uni.lieferspatz.service.mapper.UserMapper;
 
 @RestController
 @RequestMapping(value = "/api/v1/kunde")
@@ -37,8 +38,9 @@ public class KundeController {
     }
 
     @PostMapping("/erstellen")
-    public ResponseEntity<Kunde> kundeErstellen(@RequestBody KundePayload kundePayload) {
-        this.kundeService.saveNeueKunde(kundePayload);
+    public ResponseEntity<Void> kundeErstellen(@RequestBody KundePayload kundePayload) {
+        Kunde newKunde = UserMapper.mapFromKundePayload(kundePayload);
+        this.kundeService.saveNeueKunde(newKunde);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -59,6 +61,7 @@ public class KundeController {
     @PostMapping("/bestellung")
     public ResponseEntity<Void> bestellung() {
         this.bestellungService.saveBestellung();
+        // TODO: notify restaurant
         return ResponseEntity.ok().build();
     }
 

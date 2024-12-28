@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,4 +46,6 @@ public class User {
     @Column(name = "geldbeutel", precision = 15, scale = 2)
     @NotNull
     private BigDecimal geldbeutel;
+
+    public abstract String getRole();
 }

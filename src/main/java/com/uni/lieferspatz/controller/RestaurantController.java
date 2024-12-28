@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,6 @@ import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
 import com.uni.lieferspatz.dto.payload.RestaurantPayload;
-import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.RestaurantService;
 import com.uni.lieferspatz.service.mapper.BestellungMapper;
@@ -29,25 +27,20 @@ import com.uni.lieferspatz.service.mapper.UserMapper;
 @RestController
 @RequestMapping(value = "/api/v1/restaurant")
 public class RestaurantController {
-    private final PasswordEncoder passwordEncoder;
-    private final RestaurantRepository restaurantRepository;
     private final RestaurantService restaurantService;
     private final BestellungService bestellungService;
 
-    public RestaurantController(PasswordEncoder passwordEncoder,
-            RestaurantRepository restaurantRepository, RestaurantService restaurantService,
+    public RestaurantController(RestaurantService restaurantService,
             BestellungService bestellungService) {
-        this.passwordEncoder = passwordEncoder;
-        this.restaurantRepository = restaurantRepository;
         this.restaurantService = restaurantService;
         this.bestellungService = bestellungService;
     }
 
     @PostMapping("/erstellen")
-    public ResponseEntity<Restaurant> erstellen(@RequestBody RestaurantPayload restaurantPayload) {
-        Restaurant newRestaurant = UserMapper.mapRestaurant(restaurantPayload, passwordEncoder);
-        this.restaurantRepository.save(newRestaurant);
-        return new ResponseEntity<>(newRestaurant, HttpStatus.OK);
+    public ResponseEntity<Void> erstellen(@RequestBody RestaurantPayload restaurantPayload) {
+        Restaurant newRestaurant = UserMapper.mapFromRestaurantPayload(restaurantPayload);
+        this.restaurantService.saveNeueRestaurant(newRestaurant);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/plz/add")

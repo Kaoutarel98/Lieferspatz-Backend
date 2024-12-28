@@ -3,6 +3,8 @@ package com.uni.lieferspatz.domain;
 import java.util.List;
 import java.util.Set;
 
+import com.uni.lieferspatz.constants.RolesConstants;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,4 +35,9 @@ public class Restaurant extends User {
     private List<LieferPlz> lieferPlz;
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bestellung> bestellungen;
+
+    @Override
+    public String getRole() {
+        return RolesConstants.RESTAURANT;
+    }
 }
