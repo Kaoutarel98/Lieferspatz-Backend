@@ -24,6 +24,7 @@ import com.uni.lieferspatz.repository.OpeningHoursRepository;
 import com.uni.lieferspatz.repository.RestaurantRepository;
 import com.uni.lieferspatz.service.auth.SecurityUtils;
 import com.uni.lieferspatz.service.exception.ResourceException;
+import com.uni.lieferspatz.service.exception.ResourceNotFoundException;
 import com.uni.lieferspatz.service.mapper.ItemMapper;
 import com.uni.lieferspatz.service.mapper.LieferPlzMapper;
 import com.uni.lieferspatz.service.mapper.OpeningHoursMapper;
@@ -67,10 +68,11 @@ public class RestaurantService {
                 this.lieferPlzRepository.saveAll(lieferPlz);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new ResourceException("Fehler beim Speichern von PLZs");
+                throw new ResourceException(
+                        "Fehler beim Speichern der Postleitzahlen für Restaurant-ID: " + user.getId(), e);
             }
         }, () -> {
-            throw new ResourceException("Fehler beim Speichern von PLZs");
+            throw new ResourceException("Fehler beim Speichern der Postleitzahlen: Kein Benutzer eingeloggt");
         });
     }
 
@@ -78,7 +80,7 @@ public class RestaurantService {
         this.getCurrentAccount().ifPresentOrElse(user -> {
             this.saveOpeningHoursToRepo(user.getId(), openingHoursPayload);
         }, () -> {
-            throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
+            throw new ResourceException("Fehler beim Speichern der Öffnungszeiten: Kein Benutzer eingeloggt");
         });
     }
 
@@ -87,7 +89,7 @@ public class RestaurantService {
             this.validateOpeningHoursVsUserId(openingHoursPayload, user.getId());
             this.saveOpeningHoursToRepo(user.getId(), openingHoursPayload);
         }, () -> {
-            throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
+            throw new ResourceException("Fehler beim Aktualisieren der Öffnungszeiten: Kein Benutzer eingeloggt");
         });
     }
 
@@ -98,7 +100,7 @@ public class RestaurantService {
                 .filter(item -> !item.getRestaurant().getId().equals(restaurantId))
                 .collect(Collectors.toList());
         if (!invalidPayloads.isEmpty()) {
-            throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
+            throw new ResourceException("Fehler beim Aktualisieren der Öffnungszeiten: Ungültige Restaurant-ID");
         }
     }
 
@@ -108,20 +110,21 @@ public class RestaurantService {
             this.openingHoursRepository.saveAll(openingHours);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ResourceException("Fehler beim Speichern von Öffnungszeiten");
+            throw new ResourceException("Fehler beim Speichern der Öffnungszeiten für Restaurant-ID: " + restaurantId,
+                    e);
         }
     }
 
     public Restaurant getRestaurant(Long restaurantId) {
         return this.restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new ResourceException("Restaurant nicht gefunden"));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant nicht gefunden mit ID: " + restaurantId));
     }
 
     public void saveItem(ItemPayload itemPayload) {
         this.getCurrentAccount().ifPresentOrElse(user -> {
             this.saveItemToRepo(user.getId(), itemPayload);
         }, () -> {
-            throw new ResourceException("Fehler beim Hinzufügen von Item: Kein Benutzer angemeldet");
+            throw new ResourceException("Fehler beim Hinzufügen des Artikels: Kein Benutzer eingeloggt");
         });
     }
 
@@ -130,7 +133,8 @@ public class RestaurantService {
         try {
             this.itemRepository.save(item);
         } catch (Exception e) {
-            throw new ResourceException("Fehler beim Hinzufügen eines neuen Items", e);
+            throw new ResourceException(
+                    "Fehler beim Hinzufügen eines neuen Artikels für Restaurant-ID: " + restaurantId, e);
         }
     }
 
@@ -141,27 +145,27 @@ public class RestaurantService {
                     this.itemRepository.delete(item);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new ResourceException("Fehler beim Löschen von Item");
+                    throw new ResourceException("Fehler beim Löschen des Artikels mit ID: " + itemId, e);
                 }
             }, () -> {
-                throw new ResourceException("Item nicht gefunden");
+                throw new ResourceNotFoundException("Artikel nicht gefunden mit ID: " + itemId);
             });
         });
     }
 
     public void updateItem(ItemPayload itemPayload) {
         if (itemPayload.getId() == null) {
-            throw new ResourceException("Item nicht gefunden");
+            throw new ResourceException("Artikel-ID fehlt");
         }
         this.getCurrentAccount().ifPresentOrElse(user -> {
             this.itemRepository.findByIdAndRestaurantId(itemPayload.getId(), user.getId())//
                     .ifPresentOrElse(existingItem -> {
                         saveItemToRepo(user.getId(), itemPayload);
                     }, () -> {
-                        throw new ResourceException("Item nicht gefunden");
+                        throw new ResourceNotFoundException("Artikel nicht gefunden mit ID: " + itemPayload.getId());
                     });
         }, () -> {
-            throw new ResourceException("Fehler beim Hinzufügen von Item: Kein Benutzer angemeldet");
+            throw new ResourceException("Fehler beim Aktualisieren des Artikels: Kein Benutzer eingeloggt");
         });
     }
 

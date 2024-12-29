@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uni.lieferspatz.service.exception.ResourceException;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -19,7 +20,7 @@ public class JsonConverter implements AttributeConverter<Map<String, Object>, St
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Error converting Map to JSON", e);
+            throw new ResourceException("Fehler beim Konvertieren der Map in JSON", e);
         }
     }
 
@@ -28,7 +29,7 @@ public class JsonConverter implements AttributeConverter<Map<String, Object>, St
         try {
             return objectMapper.readValue(dbData, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
-            throw new IllegalArgumentException("Error converting JSON to Map", e);
+            throw new ResourceException("Fehler beim Konvertieren von JSON in Map", e);
         }
     }
 }

@@ -9,7 +9,7 @@ import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.User;
 import com.uni.lieferspatz.service.auth.JwtTokenProvider;
-import com.uni.lieferspatz.service.exception.ResourceException;
+import com.uni.lieferspatz.service.exception.ResourceNotFoundException;
 
 @Service
 public class UserService {
@@ -38,6 +38,6 @@ public class UserService {
         if (restaurant.isPresent()) {
             return restaurant.get();
         }
-        throw new ResourceException("User not found");
+        throw new ResourceNotFoundException("Kein Benutzerkonto gefunden");
     }
 }

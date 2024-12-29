@@ -18,6 +18,7 @@ import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.WarenkorbItem;
 import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.service.exception.ResourceException;
+import com.uni.lieferspatz.service.exception.ResourceNotFoundException;
 import com.uni.lieferspatz.service.mapper.BestellungMapper;
 
 import jakarta.persistence.EntityManager;
@@ -37,37 +38,42 @@ public class BestellungService {
 
     @Transactional
     public void saveBestellung() {
-        Kunde kunde = this.kundeService.getCurrentAccount().get();
-        List<WarenkorbItem> warenkorbItems = kunde.getWarenkorbItems();
-        if (warenkorbItems.size() == 0) {
-            throw new ResourceException("Warenkorb ist leer");
-        }
-        Bestellung bestellung = new Bestellung();
-        List<BestellungItem> bestellungItems = this.mapToBestellungItems(bestellung, warenkorbItems);
-        bestellung.setBestellungItems(bestellungItems);
-        BigDecimal gesamtpreis = bestellungItems.stream()
-                .map(BestellungItem::getTotalPreis)
-                .map(BigDecimal::valueOf)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (kunde.getGeldbeutel().subtract(kunde.getVorgemerkt()).compareTo(gesamtpreis) < 0) {
-            throw new ResourceException("Nicht genug Geldbeutel");
-        }
-        Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
-        bestellung.setRestaurant(restaurant);
-        bestellung.setStatus(BestellStatus.BEARBEITUNG);
-        bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
-                kunde.getPlz(), kunde.getOrt()));
-        bestellung.setBestellzeitpunkt(LocalDateTime.now());
-        bestellung.setUpdatedAt(LocalDateTime.now());
-        bestellung.setZahlungsart("PayPal");
-        bestellung.setGesamtpreis(gesamtpreis);
-        kunde.setVorgemerkt(kunde.getVorgemerkt().add(gesamtpreis));
-        kunde.addBestellung(bestellung);
-        warenkorbItems.clear();
-        entityManager.persist(kunde);
-        entityManager.flush();
-        BestellungApi bestellungApi = BestellungMapper.mapToBestellungApi(bestellung);
-        this.restaurantService.notifyRestaurant(restaurant.getEmail(), bestellungApi);
+        this.kundeService.getCurrentAccount().ifPresentOrElse(kunde -> {
+            List<WarenkorbItem> warenkorbItems = kunde.getWarenkorbItems();
+            if (warenkorbItems.isEmpty()) {
+                throw new ResourceException(
+                        "Der Warenkorb ist leer. Bitte fügen Sie Artikel hinzu, bevor Sie eine Bestellung aufgeben.");
+            }
+            Bestellung bestellung = new Bestellung();
+            List<BestellungItem> bestellungItems = this.mapToBestellungItems(bestellung, warenkorbItems);
+            bestellung.setBestellungItems(bestellungItems);
+            BigDecimal gesamtpreis = bestellungItems.stream()
+                    .map(BestellungItem::getTotalPreis)
+                    .map(BigDecimal::valueOf)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (kunde.getGeldbeutel().subtract(kunde.getVorgemerkt()).compareTo(gesamtpreis) < 0) {
+                throw new ResourceException("Nicht genügend Guthaben im Geldbeutel, um die Bestellung zu bezahlen.");
+            }
+            Restaurant restaurant = warenkorbItems.get(0).getItem().getRestaurant();
+            bestellung.setRestaurant(restaurant);
+            bestellung.setStatus(BestellStatus.BEARBEITUNG);
+            bestellung.setLieferAdresse(String.format("%s, %s %s", kunde.getStrasse(),
+                    kunde.getPlz(), kunde.getOrt()));
+            bestellung.setBestellzeitpunkt(LocalDateTime.now());
+            bestellung.setUpdatedAt(LocalDateTime.now());
+            bestellung.setZahlungsart("PayPal");
+            bestellung.setGesamtpreis(gesamtpreis);
+            kunde.setVorgemerkt(kunde.getVorgemerkt().add(gesamtpreis));
+            kunde.addBestellung(bestellung);
+            warenkorbItems.clear();
+            entityManager.persist(kunde);
+            entityManager.flush();
+            BestellungApi bestellungApi = BestellungMapper.mapToBestellungApi(bestellung);
+            this.restaurantService.notifyRestaurant(restaurant.getEmail(), bestellungApi);
+        }, () -> {
+            throw new ResourceNotFoundException(
+                    "Kunde nicht gefunden. Bitte melden Sie sich an, um eine Bestellung aufzugeben.");
+        });
     }
 
     private List<BestellungItem> mapToBestellungItems(Bestellung bestellung, List<WarenkorbItem> warenkorbItems) {
@@ -86,13 +92,13 @@ public class BestellungService {
 
     public List<Bestellung> getBestellungen() {
         return this.kundeService.getCurrentAccount()
-                .map(kunde -> kunde.getBestellungen())
+                .map(Kunde::getBestellungen)
                 .orElse(Collections.emptyList());
     }
 
     public List<Bestellung> getRestaurantBestellungen() {
         return this.restaurantService.getCurrentAccount()
-                .map(res -> res.getBestellungen())
+                .map(Restaurant::getBestellungen)
                 .orElse(Collections.emptyList());
     }
 
@@ -113,7 +119,8 @@ public class BestellungService {
                     BigDecimal restaurantGeldbeutel = res.getGeldbeutel();
                     res.setGeldbeutel(restaurantGeldbeutel.add(restaurantWin));
                 }, () -> {
-                    throw new ResourceException("Restaurant nicht gefunden");
+                    throw new ResourceNotFoundException(
+                            "Restaurant nicht gefunden. Bitte melden Sie sich an, um Bestellungen zu bestätigen.");
                 });
     }
 
@@ -128,7 +135,8 @@ public class BestellungService {
                     Kunde kunde = bestellung.getKunde();
                     kunde.setVorgemerkt(kunde.getVorgemerkt().subtract(bestellung.getGesamtpreis()));
                 }, () -> {
-                    throw new ResourceException("Restaurant nicht gefunden");
+                    throw new ResourceNotFoundException(
+                            "Restaurant nicht gefunden. Bitte melden Sie sich an, um Bestellungen zu stornieren.");
                 });
     }
 
@@ -141,7 +149,8 @@ public class BestellungService {
                     bestellung.setStatus(BestellStatus.ABGESCHLOSSEN);
                     bestellung.setUpdatedAt(LocalDateTime.now());
                 }, () -> {
-                    throw new ResourceException("Restaurant nicht gefunden");
+                    throw new ResourceNotFoundException(
+                            "Restaurant nicht gefunden. Bitte melden Sie sich an, um Bestellungen abzuschließen.");
                 });
     }
 
@@ -149,9 +158,12 @@ public class BestellungService {
         Bestellung bestellung = res.getBestellungen().stream()
                 .filter(b -> b.getId().equals(bestellungId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceException("Bestellung nicht gefunden"));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Bestellung mit ID " + bestellungId + " nicht gefunden."));
         if (!statusCondition.equals(bestellung.getStatus())) {
-            throw new ResourceException("Bestellung nicht in Bearbeitung. Status: " + bestellung.getStatus());
+            throw new ResourceException(
+                    "Die Bestellung befindet sich nicht im erwarteten Status. Aktueller Status: "
+                            + bestellung.getStatus());
         }
         return bestellung;
     }
@@ -161,7 +173,9 @@ public class BestellungService {
                 .map(kunde -> kunde.getBestellungen().stream()
                         .filter(bestellung -> bestellung.getId().equals(bestellungId))
                         .findFirst()
-                        .orElseThrow(() -> new RuntimeException("Bestellung nicht gefunden")))
-                .orElseThrow(() -> new RuntimeException("Kunde nicht gefunden"));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Bestellung mit ID " + bestellungId + " nicht gefunden.")))
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Kunde nicht gefunden. Bitte melden Sie sich an, um Ihre Bestellungen einzusehen."));
     }
 }

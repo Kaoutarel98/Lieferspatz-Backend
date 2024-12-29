@@ -15,6 +15,7 @@ import com.uni.lieferspatz.dto.payload.WarenkorbItemPayload;
 import com.uni.lieferspatz.repository.ItemRepository;
 import com.uni.lieferspatz.repository.WarenkorbRepository;
 import com.uni.lieferspatz.service.exception.ResourceException;
+import com.uni.lieferspatz.service.exception.ResourceNotFoundException;
 
 @Service
 public class WarenkorbService {
@@ -38,12 +39,12 @@ public class WarenkorbService {
     @Transactional
     public void addOrUpdateWarenkorbItem(WarenkorbItemPayload warenkorbItemPayload) {
         if (warenkorbItemPayload == null || warenkorbItemPayload.getItemId() == null) {
-            throw new IllegalArgumentException("WarenkorbItemPayload or Item ID cannot be null");
+            throw new ResourceException("WarenkorbItemPayload oder Artikel-ID dürfen nicht null sein");
         }
         this.kundeService.getCurrentAccount().ifPresent(kunde -> {
             List<WarenkorbItem> warenkorbsItems = kunde.getWarenkorbItems();
             Item item = this.itemRepository.findById(warenkorbItemPayload.getItemId())
-                    .orElseThrow(() -> new ResourceException("Item not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Artikel mit der angegebenen ID existiert nicht"));
             int quantity = warenkorbItemPayload.getQuantity();
             if (!warenkorbsItems.isEmpty()) {
                 // check if the item is from the same restaurant
