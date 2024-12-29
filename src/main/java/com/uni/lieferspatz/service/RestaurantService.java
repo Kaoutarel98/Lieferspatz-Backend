@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.LieferPlz;
 import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
+import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
@@ -34,21 +36,27 @@ public class RestaurantService {
     private final LieferPlzRepository lieferPlzRepository;
     private final RestaurantRepository restaurantRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public RestaurantService(ItemRepository itemRepository, OpeningHoursRepository openingHoursRepository,
             LieferPlzRepository lieferPlzRepository, RestaurantRepository restaurantRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder, SimpMessagingTemplate messagingTemplate) {
         this.itemRepository = itemRepository;
         this.openingHoursRepository = openingHoursRepository;
         this.lieferPlzRepository = lieferPlzRepository;
         this.restaurantRepository = restaurantRepository;
         this.passwordEncoder = passwordEncoder;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public void saveNeueRestaurant(Restaurant kunde) {
         String encodedPassword = this.passwordEncoder.encode(kunde.getPassword());
         kunde.setPassword(encodedPassword);
         this.restaurantRepository.save(kunde);
+    }
+
+    public void notifyRestaurant(String restaurantEmail, BestellungApi bestellungApi) {
+        this.messagingTemplate.convertAndSendToUser(restaurantEmail, "/queue/notifications", bestellungApi);
     }
 
     public void savePlz(LieferPlzPayload plz) {

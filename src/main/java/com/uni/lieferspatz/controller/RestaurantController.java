@@ -82,7 +82,7 @@ public class RestaurantController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/bestellung")
+    @GetMapping("/bestellungen")
     public ResponseEntity<List<BestellungApi>> getBestellungen() {
         List<Bestellung> bestellungs = this.bestellungService.getRestaurantBestellungen();
         List<BestellungApi> result = BestellungMapper.mapToBestellungApi(bestellungs);

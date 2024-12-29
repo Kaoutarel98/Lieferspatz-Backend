@@ -16,7 +16,9 @@ import com.uni.lieferspatz.domain.BestellungItem;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.domain.WarenkorbItem;
+import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.service.exception.ResourceException;
+import com.uni.lieferspatz.service.mapper.BestellungMapper;
 
 import jakarta.persistence.EntityManager;
 
@@ -64,6 +66,8 @@ public class BestellungService {
         warenkorbItems.clear();
         entityManager.persist(kunde);
         entityManager.flush();
+        BestellungApi bestellungApi = BestellungMapper.mapToBestellungApi(bestellung);
+        this.restaurantService.notifyRestaurant(restaurant.getEmail(), bestellungApi);
     }
 
     private List<BestellungItem> mapToBestellungItems(Bestellung bestellung, List<WarenkorbItem> warenkorbItems) {

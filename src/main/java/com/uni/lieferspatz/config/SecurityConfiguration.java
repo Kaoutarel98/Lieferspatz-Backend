@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.uni.lieferspatz.repository.KundeRepository;
 import com.uni.lieferspatz.repository.RestaurantRepository;
@@ -23,7 +24,6 @@ import com.uni.lieferspatz.service.auth.JwtFilter;
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
 public class SecurityConfiguration {
-
     private final JwtFilter jwtFilter;
 
     public SecurityConfiguration(JwtFilter jwtFilter) {
@@ -65,11 +65,12 @@ public class SecurityConfiguration {
         )
         .authorizeHttpRequests(authz -> authz
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests
-            .requestMatchers("/app/**/*.{js,html}").permitAll() // Allow .js files in /app (recursive)
+            .requestMatchers(AntPathRequestMatcher.antMatcher("/app/**/*.{js,html}")).permitAll() // Allow .js files in /app (recursive)
             .requestMatchers("/i18n/**").permitAll() // Allow internationalization files
             .requestMatchers("/content/**").permitAll() // Allow content resources
             .requestMatchers("/swagger-ui/**").permitAll() // Allow Swagger UI
             .requestMatchers("/test/**").permitAll()
+            .requestMatchers("/order-request/**").hasRole("RESTAURANT")
             .requestMatchers("/api/**/erstellen").permitAll()
             .requestMatchers("/api/**/login").permitAll()
             .requestMatchers("/api/**/kunde").hasRole("KUNDE")
@@ -80,5 +81,4 @@ public class SecurityConfiguration {
     //@formatter:on 
         return http.build();
     }
-
 }

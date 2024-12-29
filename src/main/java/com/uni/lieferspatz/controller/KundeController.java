@@ -61,7 +61,6 @@ public class KundeController {
     @PostMapping("/bestellung")
     public ResponseEntity<Void> bestellung() {
         this.bestellungService.saveBestellung();
-        // TODO: notify restaurant
         return ResponseEntity.ok().build();
     }
 

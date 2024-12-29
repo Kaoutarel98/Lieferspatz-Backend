@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtFilter extends GenericFilterBean {
-
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -42,7 +41,10 @@ public class JwtFilter extends GenericFilterBean {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+        bearerToken = request.getParameter("token");
+        if (StringUtils.hasText(bearerToken)) {
+            return bearerToken;
+        }
         return null;
     }
-
 }

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lieferspatz - Bestellübersicht für Restaurants</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .order-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .order-details {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .items-table th,
+        .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .items-table th {
+            background-color: #f2f2f2;
+        }
+
+        .items-table td {
+            color: #333;
+        }
+    </style>
+    <script type="text/javascript">
+        var stompClient = null;
+
+        function connect() {
+            var socket = new SockJS('http://localhost:8080/order-request?token=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZXN0YXVyYW50QHBvc3RtYW4uY29tIiwiZXhwIjoxNzM1NTE4OTg3LCJhdXRoIjoiUk9MRV9SRVNUQVVSQU5UIn0.-vVhE1ULjBXNLN0XCQu9bBHx8FZejYq95rfnheX7oBM0BI9Ybqzb_uoZypI7ov8Q9Lcv_oMlp9u80tYb4RG2fg');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Verbunden: ' + frame);
+                stompClient.subscribe('/user/restaurant@postman.com/queue/notifications', function (messageOutput) {
+                    showMessageOutput(JSON.parse(messageOutput.body));
+                });
+            });
+        }
+
+        function showMessageOutput(messageOutput) {
+            var response = document.getElementById('response');
+
+            // Create a new card for each order
+            var card = document.createElement('div');
+            card.className = 'order-card';
+
+            // Add order details
+            var header = document.createElement('div');
+            header.className = 'order-header';
+            header.textContent = `Bestellung #${messageOutput.id} - Kunde: ${messageOutput.kundeName}`;
+            card.appendChild(header);
+
+            var details = document.createElement('div');
+            details.className = 'order-details';
+            details.textContent = `Gesamtpreis: €${messageOutput.gesamtpreis.toFixed(2)}, Lieferadresse: ${messageOutput.lieferAdresse}`;
+            card.appendChild(details);
+
+            // Add items table
+            var table = document.createElement('table');
+            table.className = 'items-table';
+
+            var tableHeader = `
+                <thead>
+                    <tr>
+                        <th>Artikel</th>
+                        <th>Menge</th>
+                        <th>Einzelpreis</th>
+                        <th>Gesamtpreis</th>
+                    </tr>
+                </thead>
+            `;
+            table.innerHTML = tableHeader;
+
+            var tableBody = document.createElement('tbody');
+            messageOutput.bestellungItems.forEach((item) => {
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.itemLabel}</td>
+                    <td>${item.quantity}</td>
+                    <td>€${item.preis.toFixed(2)}</td>
+                    <td>€${item.totalPreis.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            table.appendChild(tableBody);
+            card.appendChild(table);
+
+            // Append the card to the response container
+            response.appendChild(card);
+        }
+    </script>
+</head>
+
+<body onload="connect()">
+    <header>
+        <h1>Lieferspatz - Übersicht der Bestellungen</h1>
+    </header>
+    <div class="container">
+        <p>Willkommen bei Lieferspatz!</p>
+        <p>Sie erhalten hier einen Live-Überblick über die neuen Bestellungen, die von Kunden bei Ihrem Restaurant
+            aufgegeben wurden.</p>
+        <p><strong>Hinweis:</strong> Bestellungen erscheinen automatisch, sobald sie eingehen. Es ist kein Neuladen der
+            Seite erforderlich.</p>
+        <div id="response"></div>
+    </div>
+</body>
+
+</html>
