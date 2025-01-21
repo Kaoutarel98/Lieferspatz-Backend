@@ -1,5 +1,6 @@
 package com.uni.lieferspatz.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +58,8 @@ public class RestaurantService {
     }
 
     public void notifyRestaurant(String restaurantEmail, BestellungApi bestellungApi) {
+        // نرسل الطلب إلى المطعم عن طريق البريد الإلكتروني بواسطة ويب سوكيت على شكل
+        // اشعار/تنبيه
         this.messagingTemplate.convertAndSendToUser(restaurantEmail, "/queue/notifications", bestellungApi);
     }
 
@@ -126,6 +129,12 @@ public class RestaurantService {
         }, () -> {
             throw new ResourceException("Fehler beim Hinzufügen des Artikels: Kein Benutzer eingeloggt");
         });
+    }
+
+    public Set<Item> getItems() {
+        return this.getCurrentAccount() //
+                .map(Restaurant::getItems) //
+                .orElse(Collections.emptySet());
     }
 
     private void saveItemToRepo(Long restaurantId, ItemPayload itemPayload) {

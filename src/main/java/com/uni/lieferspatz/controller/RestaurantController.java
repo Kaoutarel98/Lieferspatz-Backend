@@ -1,6 +1,7 @@
 package com.uni.lieferspatz.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Bestellung;
+import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.BestellungApi;
+import com.uni.lieferspatz.dto.api.ItemApi;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
@@ -22,6 +25,7 @@ import com.uni.lieferspatz.dto.payload.RestaurantPayload;
 import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.RestaurantService;
 import com.uni.lieferspatz.service.mapper.BestellungMapper;
+import com.uni.lieferspatz.service.mapper.ItemMapper;
 import com.uni.lieferspatz.service.mapper.UserMapper;
 
 @RestController
@@ -68,6 +72,15 @@ public class RestaurantController {
     public ResponseEntity<String> addItem(@RequestBody ItemPayload itemPayload) {
         this.restaurantService.saveItem(itemPayload);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/items")
+    public ResponseEntity<List<ItemApi>> getItems() {
+        List<Item> items = this.restaurantService.getItems()//
+                .stream()//
+                .collect(Collectors.toList());
+        List<ItemApi> result = ItemMapper.mapToItemApi(items);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/item/delete/{itemId}")

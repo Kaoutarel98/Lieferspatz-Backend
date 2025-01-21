@@ -46,11 +46,16 @@ public class KundeService {
         LocalDateTime now = LocalDateTime.now();
         DayOfWeek today = now.getDayOfWeek();
         LocalTime currentTime = now.toLocalTime();
+        // getCurrentAccount():
+        // نقرأ البريد الالكتروني للحساب الحالي تم نقرأ معلومات الحساب من قاعدة البيانات
+        // اذا لم يكن الحساب موجود نعيد قائمة فارغة
+        // Optional<Kunde>
         List<LieferPlz> relatedPlz = this.getCurrentAccount()//
-                .map(user -> this.lieferPlzRepository.findAllByPlz(user.getPlz()))
+                .map(Kunde::getPlz)//
+                .map(plz -> this.lieferPlzRepository.findAllByPlz(plz))
                 .orElse(Collections.emptyList());
         return relatedPlz.stream()//
-                .map(LieferPlz::getRestaurant)
+                .map(lieferPlz -> lieferPlz.getRestaurant())
                 .map(Restaurant::getOpeningHours)
                 .flatMap(List::stream)
                 .filter(openingHours -> this.isRestaurantOpen(openingHours, currentTime, today))
@@ -68,9 +73,14 @@ public class KundeService {
         return openingHours.getDayOfWeek().equals(today)//
                 && currenTime.isAfter(openingHours.getOpenTime())//
                 && currenTime.isBefore(openingHours.getCloseTime());
+        // today == openingHours.getDayOfWeek()
+        // currentTime zwischen öffungszeit und schließzeit -> currentTime nach
+        // öffungszeit und vor schließzeit
+        // Montag um 12:00 -> 00:00
     }
 
     public Optional<Kunde> getCurrentAccount() {
+        // نحصل على الحساب الحالي من خلال البريد الإلكتروني
         return SecurityUtils.getCurrentAccountEmail().flatMap(this.kundeRepository::findOneByEmailIgnoreCase);
     }
 }
