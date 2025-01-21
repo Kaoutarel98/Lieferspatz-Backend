@@ -53,6 +53,7 @@ public class SecurityConfiguration {
         config.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Allow your Angular dev server
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
