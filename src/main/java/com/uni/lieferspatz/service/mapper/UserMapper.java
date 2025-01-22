@@ -3,6 +3,8 @@ package com.uni.lieferspatz.service.mapper;
 import java.math.BigDecimal;
 import java.util.Base64;
 
+import org.springframework.util.StringUtils;
+
 import com.uni.lieferspatz.constants.RolesConstants;
 import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
@@ -38,10 +40,12 @@ public class UserMapper {
         newRestaurant.setName(restaurantPayload.getName());
         newRestaurant.setBeschreibung(restaurantPayload.getBeschreibung());
         String base64Image = restaurantPayload.getImage();
-        if (base64Image.contains(",")) {
-            base64Image = base64Image.split(",")[1];
+        if (StringUtils.hasText(base64Image)) {
+            if (base64Image.contains(",")) {
+                base64Image = base64Image.split(",")[1];
+            }
+            newRestaurant.setImage(Base64.getDecoder().decode(base64Image));
         }
-        newRestaurant.setImage(Base64.getDecoder().decode(base64Image));
         newRestaurant.setGeldbeutel(BigDecimal.ZERO);
         return newRestaurant;
     }

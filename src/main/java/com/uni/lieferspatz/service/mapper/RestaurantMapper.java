@@ -16,7 +16,10 @@ public class RestaurantMapper {
         restaurantApi.setPlz(restaurant.getPlz());
         restaurantApi.setOrt(restaurant.getOrt());
         restaurantApi.setBeschreibung(restaurant.getBeschreibung());
-        restaurantApi.setImage("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(restaurant.getImage()));
+        if (restaurant.getImage() != null) {
+            restaurantApi
+                    .setImage("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(restaurant.getImage()));
+        }
         return restaurantApi;
     }
 

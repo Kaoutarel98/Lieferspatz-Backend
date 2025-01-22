@@ -35,7 +35,7 @@ public class Item {
     private double preis;
 
     @Column(name = "image_url")
-    private String imageUrl;
+    private byte[] imageUrl;
 
     @JoinColumn(name = "restaurant_id", nullable = false)
     @ManyToOne
