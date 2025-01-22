@@ -1,6 +1,7 @@
 package com.uni.lieferspatz.service.mapper;
 
 import java.math.BigDecimal;
+import java.util.Base64;
 
 import com.uni.lieferspatz.constants.RolesConstants;
 import com.uni.lieferspatz.domain.Kunde;
@@ -36,7 +37,11 @@ public class UserMapper {
         mapUser(newRestaurant, restaurantPayload);
         newRestaurant.setName(restaurantPayload.getName());
         newRestaurant.setBeschreibung(restaurantPayload.getBeschreibung());
-        newRestaurant.setImage(restaurantPayload.getImage());
+        String base64Image = restaurantPayload.getImage();
+        if (base64Image.contains(",")) {
+            base64Image = base64Image.split(",")[1];
+        }
+        newRestaurant.setImage(Base64.getDecoder().decode(base64Image));
         newRestaurant.setGeldbeutel(BigDecimal.ZERO);
         return newRestaurant;
     }
@@ -64,7 +69,7 @@ public class UserMapper {
         restaurantApi.setEmail(restaurant.getEmail());
         restaurantApi.setName(restaurant.getName());
         restaurantApi.setBeschreibung(restaurant.getBeschreibung());
-        restaurantApi.setImage(restaurant.getImage());
+        restaurantApi.setImage(Base64.getEncoder().encodeToString(restaurant.getImage()));
         restaurantApi.setGeldbeutel(restaurant.getGeldbeutel().doubleValue());
         return restaurantApi;
     }

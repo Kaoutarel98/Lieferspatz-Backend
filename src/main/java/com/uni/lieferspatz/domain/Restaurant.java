@@ -26,7 +26,7 @@ public class Restaurant extends User {
     @NotNull
     private String beschreibung;
     @Column(name = "image")
-    private String image;
+    private byte[] image;
     @OneToMany(mappedBy = "restaurant")
     private Set<Item> items;
     @OneToMany(mappedBy = "restaurant")
