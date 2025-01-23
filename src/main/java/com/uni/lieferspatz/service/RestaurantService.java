@@ -87,6 +87,10 @@ public class RestaurantService {
         });
     }
 
+    public List<OpeningHours> getOpeningHours() {
+        return this.getCurrentAccount().map(Restaurant::getOpeningHours).orElse(Collections.emptyList());
+    }
+
     public void updateOpeningHours(List<OpeningHoursPayload> openingHoursPayload) {
         this.getCurrentAccount().ifPresentOrElse(user -> {
             this.validateOpeningHoursVsUserId(openingHoursPayload, user.getId());

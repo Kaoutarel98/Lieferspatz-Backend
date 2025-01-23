@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.lieferspatz.domain.Bestellung;
 import com.uni.lieferspatz.domain.Item;
+import com.uni.lieferspatz.domain.OpeningHours;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.BestellungApi;
 import com.uni.lieferspatz.dto.api.ItemApi;
+import com.uni.lieferspatz.dto.api.OpeningHoursApi;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 import com.uni.lieferspatz.dto.payload.OpeningHoursPayload;
@@ -26,6 +28,7 @@ import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.RestaurantService;
 import com.uni.lieferspatz.service.mapper.BestellungMapper;
 import com.uni.lieferspatz.service.mapper.ItemMapper;
+import com.uni.lieferspatz.service.mapper.OpeningHoursMapper;
 import com.uni.lieferspatz.service.mapper.UserMapper;
 
 @RestController
@@ -59,6 +62,13 @@ public class RestaurantController {
             @RequestBody List<OpeningHoursPayload> openingHoursPayload) {
         this.restaurantService.saveOpeningHours(openingHoursPayload);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/opening")
+    public ResponseEntity<List<OpeningHoursApi>> getOpeningHours() {
+        List<OpeningHours> openingHours = this.restaurantService.getOpeningHours();
+        List<OpeningHoursApi> result = OpeningHoursMapper.mapToOpeningHoursApi(openingHours);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/opening/update")
