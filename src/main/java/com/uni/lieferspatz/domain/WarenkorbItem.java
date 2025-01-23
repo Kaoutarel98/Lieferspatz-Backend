@@ -31,4 +31,6 @@ public class WarenkorbItem {
     private int quantity;
     @Column(name = "added_at")
     private LocalDateTime addedAt;
+    @Column(name = "remark")
+    private String remark;
 }

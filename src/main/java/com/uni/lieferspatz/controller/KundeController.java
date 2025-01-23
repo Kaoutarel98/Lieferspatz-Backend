@@ -17,7 +17,7 @@ import com.uni.lieferspatz.domain.Kunde;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.AvailableRestaurantApi;
 import com.uni.lieferspatz.dto.api.BestellungApi;
-import com.uni.lieferspatz.dto.api.ItemApi;
+import com.uni.lieferspatz.dto.api.ItemsApi;
 import com.uni.lieferspatz.dto.payload.KundePayload;
 import com.uni.lieferspatz.service.BestellungService;
 import com.uni.lieferspatz.service.KundeService;
@@ -52,9 +52,9 @@ public class KundeController {
     }
 
     @GetMapping("/restaurant/{restaurantId}/items")
-    public ResponseEntity<List<ItemApi>> getRestaurantItems(@PathVariable Long restaurantId) {
+    public ResponseEntity<ItemsApi> getRestaurantItems(@PathVariable Long restaurantId) {
         List<Item> items = this.kundeService.getRestaurantItems(restaurantId);
-        List<ItemApi> result = ItemMapper.mapToItemApi(items);
+        ItemsApi result = ItemMapper.mapToItemsApi(items);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

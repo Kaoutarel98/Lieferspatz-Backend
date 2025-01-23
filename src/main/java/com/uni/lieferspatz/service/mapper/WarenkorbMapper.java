@@ -11,7 +11,10 @@ public class WarenkorbMapper {
         WarenkorbApi warenkorbApi = new WarenkorbApi();
         warenkorbApi.setItemId(warenkorbItem.getItem().getId());
         warenkorbApi.setPreis(warenkorbItem.getItem().getPreis());
+        warenkorbApi.setName(warenkorbItem.getItem().getName());
         warenkorbApi.setQuantity(warenkorbItem.getQuantity());
+        warenkorbApi.setBeschreibung(warenkorbItem.getItem().getBeschreibung());
+        warenkorbApi.setRemark(warenkorbItem.getRemark());
         return warenkorbApi;
     }
 

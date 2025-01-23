@@ -63,16 +63,17 @@ public class WarenkorbService {
                         } else {
                             warentkorbItem.setQuantity(quantity);
                             warentkorbItem.setAddedAt(LocalDateTime.now());
+                            warentkorbItem.setRemark(warenkorbItemPayload.getRemark());
                         }
                     }, () -> {
                         if (quantity > 0) {
-                            this.saveNewWarenkorbItem(kunde, item, quantity);
+                            this.saveNewWarenkorbItem(kunde, item, quantity, warenkorbItemPayload.getRemark());
                         }
                     });
         });
     }
 
-    private void saveNewWarenkorbItem(Kunde kunde, Item item, int quantity) {
+    private void saveNewWarenkorbItem(Kunde kunde, Item item, int quantity, String remark) {
         WarenkorbKey warenkorbKey = new WarenkorbKey(kunde.getId(), item.getId());
         WarenkorbItem warenkorb = new WarenkorbItem();
         warenkorb.setId(warenkorbKey);
@@ -80,6 +81,7 @@ public class WarenkorbService {
         warenkorb.setQuantity(quantity);
         warenkorb.setItem(item);
         warenkorb.setKunde(kunde);
+        warenkorb.setRemark(remark);
         this.warenkorbRepository.save(warenkorb);
     }
 

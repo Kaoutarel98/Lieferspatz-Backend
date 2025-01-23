@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import com.uni.lieferspatz.domain.Item;
 import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.api.ItemApi;
+import com.uni.lieferspatz.dto.api.ItemsApi;
 import com.uni.lieferspatz.dto.payload.ItemPayload;
 
 public class ItemMapper {
@@ -45,5 +46,22 @@ public class ItemMapper {
 
     public static List<ItemApi> mapToItemApi(List<Item> items) {
         return items.stream().map(ItemMapper::mapToItemApi).collect(Collectors.toList());
+    }
+
+    public static ItemsApi mapToItemsApi(List<Item> items) {
+        ItemsApi itemsApi = new ItemsApi();
+        if (items == null || items.isEmpty()) {
+            return itemsApi;
+        }
+        Item item = items.get(0);
+        Restaurant restaurant = item.getRestaurant();
+        itemsApi.setRestaurantName(restaurant.getName());
+        if (restaurant.getImage() != null) {
+            itemsApi.setRestaurantImage(
+                    "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(restaurant.getImage()));
+        }
+        List<ItemApi> itemApi = items.stream().map(ItemMapper::mapToItemApi).collect(Collectors.toList());
+        itemsApi.setItems(itemApi);
+        return itemsApi;
     }
 }

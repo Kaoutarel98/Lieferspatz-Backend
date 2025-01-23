@@ -8,4 +8,5 @@ import lombok.Setter;
 public class WarenkorbItemPayload {
     private Long itemId;
     private int quantity;
+    private String remark;
 }
