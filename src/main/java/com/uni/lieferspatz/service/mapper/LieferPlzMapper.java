@@ -1,6 +1,7 @@
 package com.uni.lieferspatz.service.mapper;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,7 +12,6 @@ import com.uni.lieferspatz.domain.Restaurant;
 import com.uni.lieferspatz.dto.payload.LieferPlzPayload;
 
 public class LieferPlzMapper {
-
     private static LieferPlz mapFromPayload(Long restaurantId, String lieferPlzPayload) {
         LieferPlz lieferPlz = new LieferPlz();
         lieferPlz.setPlz(lieferPlzPayload);
@@ -28,5 +28,11 @@ public class LieferPlzMapper {
                 .distinct() //
                 .map(plz -> mapFromPayload(restaurantId, plz)) //
                 .collect(Collectors.toSet());
+    }
+
+    public static String mapToApi(List<LieferPlz> lieferPlz) {
+        return lieferPlz.stream() //
+                .map(LieferPlz::getPlz) //
+                .collect(Collectors.joining(","));
     }
 }

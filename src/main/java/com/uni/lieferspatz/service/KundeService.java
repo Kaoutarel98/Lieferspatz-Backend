@@ -71,6 +71,8 @@ public class KundeService {
 
     private boolean isRestaurantOpen(OpeningHours openingHours, LocalTime currenTime, DayOfWeek today) {
         return openingHours.getDayOfWeek().equals(today)//
+                && openingHours.getOpenTime() != null//
+                && openingHours.getCloseTime() != null//
                 && currenTime.isAfter(openingHours.getOpenTime())//
                 && currenTime.isBefore(openingHours.getCloseTime());
         // today == openingHours.getDayOfWeek()

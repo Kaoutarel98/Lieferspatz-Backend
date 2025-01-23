@@ -1,5 +1,6 @@
 package com.uni.lieferspatz.service.mapper;
 
+import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class OpeningHoursMapper {
         restaurant.setId(restaurantId);
         openingHours.setId(openingHoursPayload.getId());
         openingHours.setRestaurant(restaurant);
-        openingHours.setDayOfWeek(openingHoursPayload.getDayOfWeek());
+        openingHours.setDayOfWeek(DayOfWeek.valueOf(openingHoursPayload.getDayOfWeek().toUpperCase()));
         openingHours.setOpenTime(openingHoursPayload.getOpenTime());
         openingHours.setCloseTime(openingHoursPayload.getCloseTime());
         return openingHours;
@@ -34,8 +35,10 @@ public class OpeningHoursMapper {
         openingHoursApi.setId(openingHours.getId());
         openingHoursApi.setDayOfWeek(openingHours.getDayOfWeek());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        openingHoursApi.setOpenTime(openingHours.getOpenTime().format(formatter));
-        openingHoursApi.setCloseTime(openingHours.getCloseTime().format(formatter));
+        openingHoursApi
+                .setOpenTime(openingHours.getOpenTime() == null ? null : openingHours.getOpenTime().format(formatter));
+        openingHoursApi.setCloseTime(
+                openingHours.getCloseTime() == null ? null : openingHours.getCloseTime().format(formatter));
         return openingHoursApi;
     }
 

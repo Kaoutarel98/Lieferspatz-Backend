@@ -79,6 +79,10 @@ public class RestaurantService {
         });
     }
 
+    public String getPlz() {
+        return this.getCurrentAccount().map(user -> LieferPlzMapper.mapToApi(user.getLieferPlz())).orElse("");
+    }
+
     public void saveOpeningHours(List<OpeningHoursPayload> openingHoursPayload) {
         this.getCurrentAccount().ifPresentOrElse(user -> {
             this.saveOpeningHoursToRepo(user.getId(), openingHoursPayload);

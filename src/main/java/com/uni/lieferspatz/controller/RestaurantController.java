@@ -1,6 +1,8 @@
 package com.uni.lieferspatz.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -55,6 +57,14 @@ public class RestaurantController {
             @RequestBody LieferPlzPayload plz) {
         this.restaurantService.savePlz(plz);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/plz")
+    public ResponseEntity<Map<String, String>> getPlz() {
+        String result = this.restaurantService.getPlz();
+        Map<String, String> response = new HashMap<>();
+        response.put("plz", result);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/opening/add")
