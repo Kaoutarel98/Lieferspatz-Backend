@@ -41,6 +41,7 @@ public class UserMapper {
         newRestaurant.setBeschreibung(restaurantPayload.getBeschreibung());
         String base64Image = restaurantPayload.getImage();
         if (StringUtils.hasText(base64Image)) {
+            // remove data:image/jpeg;base64,oiiodsajiodsajeiowqjiodjsa
             if (base64Image.contains(",")) {
                 base64Image = base64Image.split(",")[1];
             }

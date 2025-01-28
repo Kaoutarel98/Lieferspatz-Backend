@@ -19,7 +19,7 @@ import com.uni.lieferspatz.service.UserService;
 import com.uni.lieferspatz.service.auth.JwtFilter;
 import com.uni.lieferspatz.service.mapper.UserMapper;
 
-// localhost:8080/api/v1/kunde/
+// GET localhost:8080/api/v1/user
 @RestController
 @RequestMapping(value = "/api/v1/user")
 public class UserController {
@@ -37,9 +37,15 @@ public class UserController {
     public ResponseEntity<Void> login(@RequestBody LoginPayload loginPayload) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginPayload.getEmail(), loginPayload.getPassword());
+        // Ruft intern AccountService.loadUserByUsername auf und authentifiziert den
+        // Benutzer mit den angegebenen loginPayload (E-Mail und Passwort)
         Authentication authentication = this.authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         String jwt = this.userService.generateJwtToken(authentication);
         HttpHeaders httpHeaders = new HttpHeaders();
+        // Schlüssel : Wert
+        // JwtFilter.AUTHORIZATION_HEADER = "Authorization"
+        // Authorization : Bearer <jwt>
+        // Authorization: Bearer eyam123545
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return new ResponseEntity<>(httpHeaders, HttpStatus.OK);
     }

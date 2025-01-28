@@ -32,7 +32,6 @@ public class JwtTokenProvider {
     private final Key key;
 
     public JwtTokenProvider() {
-        // this.cgtProperties = cgtProperties;
         String secret = this.getBase64Secret();
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -42,14 +41,14 @@ public class JwtTokenProvider {
     public String generateJwtToken(Authentication authentication) {
         String authorities = authentication.getAuthorities()//
                 .stream()//
-                .map(GrantedAuthority::getAuthority)//
-                .collect(Collectors.joining(","));
+                .map(GrantedAuthority::getAuthority)// Kunde + Restaurant
+                .collect(Collectors.joining(",")); // ["Kunde", "Restaurant"] -> "Kunde,Restaurant"
         Date expirationDate = this.getExpirationDate();
         JwtBuilder jwtBuilder = Jwts.builder()//
                 .setSubject(authentication.getName())//
                 .signWith(this.key, SignatureAlgorithm.HS512)//
                 .setExpiration(expirationDate);
-        jwtBuilder.claim(AUTHORITIES_KEY, authorities);
+        jwtBuilder.claim(AUTHORITIES_KEY, authorities); // "auth": "Kunde,Restaurant"
         return jwtBuilder.compact();
     }
 
@@ -84,7 +83,6 @@ public class JwtTokenProvider {
                 .filter(StringUtils::hasText)//
                 .map(SimpleGrantedAuthority::new)//
                 .collect(Collectors.toList());
-
         String subject = claims.getSubject();
         return new UsernamePasswordAuthenticationToken(subject, token, authorities);
     }
