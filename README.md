@@ -8,11 +8,11 @@
 - **Benutzerauthentifizierung**: Sichere Anmeldung und Registrierung der Benutzer mit **JWT** (JSON Web Tokens).
 - **Echtzeit-Kommunikation**: Verfolgen von Bestellungen und Lieferstatus in Echtzeit über **WebSocket**.
 - **RESTful API**: Bereitstellung von Endpunkten zum Abrufen von Restaurantdaten, Bestellungen und Benutzerinformationen.
-- **Datenbank**: Verwaltung der Daten über eine relationale Datenbank (z.B. MySQL).
+- **SQLite**: Verwendung einer SQLite-Datenbank zur Speicherung der Anwendungsdaten.
 
 ## Technologien
 - **Java 17**
 - **Spring Boot** (für die Backend-Entwicklung)
 - **JWT** (JSON Web Tokens für die Benutzerauthentifizierung)
 - **WebSocket** (für die Echtzeit-Kommunikation)
-- **MySQL** (Datenbank)
+- **SQLite** (Datenbank)
